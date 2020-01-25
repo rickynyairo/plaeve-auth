@@ -1,0 +1,79 @@
+syntax = "proto3";
+package plaeve.auth;
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_swagger) = {
+	info: {
+		title: "Auth service";
+		version: "1.0";
+		contact: {
+			name: "plaeve-auth";
+			url: "https://github.com/rickynyairo/plaeve-auth";
+			email: "rickynyairo@gmail.com";
+        };
+    };
+    schemes: HTTP;
+    consumes: "application/json";
+    produces: "application/json";
+    responses: {
+		key: "404";
+		value: {
+			description: "Returned when the resource does not exist.";
+			schema: {
+				json_schema: {
+					type: STRING;
+				}
+			}
+		}
+	}
+};
+
+service Auth {
+    rpc Create(User) returns (Response) {
+        option (google.api.http) = {
+            post: "/auth/create"
+            body: "*"
+        };
+    }
+    rpc Login(User) returns (Token) {
+        option (google.api.http) = {
+            post: "/auth/login"
+            body: "*"
+        };
+    }
+    rpc Get(User) returns (Response) {}
+    rpc GetAll(Request) returns (Response) {}
+    rpc ValidateToken(Token) returns (Token) {}
+}
+
+message User {
+    string id = 1;
+    string name = 2;
+    string email = 4;
+    string password = 5;
+}
+
+message Request {}
+
+
+message Token {
+    string token = 1;
+    bool valid = 2;
+    repeated Error errors = 3;
+}
+
+message Response {
+    User user = 1;
+    repeated User users = 2;
+    repeated Error errors = 3;
+    google.protobuf.Timestamp created_at = 6;
+    Token token = 4;
+}
+
+message Error {
+    int32 code = 1;
+    string description = 2;
+}
